@@ -1,26 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import Planet from "../Planet";
 
-const fetchPlanets = async (page) => {
+const fetchPlanets = async (key, page) => {
   const res = await fetch(`http://swapi.dev/api/planets/?page=${page}`);
   return res.json();
 };
 
 function Planets() {
   const [page, setPage] = useState(1);
-  const { data, status, isPlaceholderData } = useQuery({
-    queryKey: ["planets", page],
+  const { data, status } = useQuery({
+    queryKey: ["planets", 2],
     queryFn: fetchPlanets,
-    placeholderData: keepPreviousData,
   });
   console.log(data);
 
-  const [Loading, SetLoading] = useState(true);
+  const [Loading, setLoading] = useState(true);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      SetLoading(false);
+      setLoading(false);
     }, 2000);
     return () => clearTimeout(timer);
   }, []);
@@ -29,32 +28,16 @@ function Planets() {
     <div>
       <h2>Planets</h2>
 
+      <button onClick={()=> setPage(1)}>1</button>
+      <button onClick={()=> setPage(2)} >2</button>
+      <button onClick={()=>setPage(3)} >3</button>
       {Loading && <div>Loading data...</div>}
       {status === "error" && <div>Error fetching data</div>}
       {status === "success" && (
         <div>
-          <>
-            <button
-              onClick={() => setPage((old) => Math.max(old - 1, 1))}
-              disabled={page === 0}
-            >
-              Previous Page
-            </button>
-            <span>{page}</span>
-            <button
-              onClick={() =>
-                setPage((old) =>
-                  data && !isPlaceholderData && data.next ? old + 1 : old
-                )
-              }
-            >
-              Next Page
-            </button>
-
-            {data.results.map((planet) => (
-              <Planet key={planet.name} planet={planet} />
-            ))}
-          </>
+          {data.results.map((planet) => (
+            <Planet key={planet.name} planet={planet} />
+          ))}
         </div>
       )}
     </div>
