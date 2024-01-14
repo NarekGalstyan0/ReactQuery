@@ -10,7 +10,7 @@ const fetchPlanets = async (key, page) => {
 function Planets() {
   const [page, setPage] = useState(1);
   const { data, status } = useQuery({
-    queryKey: ["planets", 2],
+    queryKey: ["planets", page],
     queryFn: fetchPlanets,
   });
   console.log(data);
